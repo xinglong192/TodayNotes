@@ -1,0 +1,902 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CusNoteList</class>
+ <widget class="QWidget" name="CusNoteList">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>437</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>笔记列表</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <item row="0" column="0">
+    <layout class="QGridLayout" name="gridLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <item row="1" column="0" colspan="2">
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QFrame" name="horizontalFrame">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>60</height>
+          </size>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>1</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>5</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QDateTimeEdit" name="dateTimeEdit">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip">
+               <string>右键可切换模式时间</string>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">/** 日期显示板 **/
+#qt_calendar_calendarview::item:hover {
+	color:rgba(70, 141, 211,0.7);
+	background: rgb(239, 239, 239);
+	border-radius: 10px;
+}
+#qt_calendar_calendarview::item {
+	border-radius: 10px;
+}
+#qt_calendar_calendarview::item:focus {
+	color: white;
+	background-color: rgba(70, 141, 211,0.7);
+}
+QCalendarWidget QAbstractItemView:enabled {
+	outline:none;
+	color:black;
+	background: white;
+
+}
+QCalendarWidget QAbstractItemView:disabled 
+{ 
+	color: rgb(179, 179, 179) ; 
+}
+/* 导航栏  及 导航栏中按钮设置*/
+
+#qt_calendar_navigationbar {
+	color: rgb(148, 148, 148);
+    background: white;
+}
+QToolButton{
+	color: rgb(81, 81, 81);
+    background: white;
+	qproperty-icon: none;
+
+}
+#qt_calendar_prevmonth{/*上一月*/
+	qproperty-text:'&lt;';
+	font:15px;
+	border-radius: 10px;
+}
+#qt_calendar_prevmonth:hover{/*上一月*/
+	color:rgba(70, 141, 211,0.7);
+}
+#qt_calendar_nextmonth{/*下一月*/
+	qproperty-text:'&gt;';
+	font:15px;
+	border-radius: 10px;
+}
+#qt_calendar_nextmonth:hover{
+	color:rgba(70, 141, 211,0.7);
+}
+/***************************************************/
+</string>
+              </property>
+              <property name="buttonSymbols">
+               <enum>QAbstractSpinBox::PlusMinus</enum>
+              </property>
+              <property name="currentSection">
+               <enum>QDateTimeEdit::YearSection</enum>
+              </property>
+              <property name="displayFormat">
+               <string>yyyy/MM/dd</string>
+              </property>
+              <property name="calendarPopup">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QWidget" name="dateIntervalWidget" native="true">
+              <layout class="QHBoxLayout" name="dateIntervalFrame">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="label">
+                 <property name="text">
+                  <string>始:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDateTimeEdit" name="dateTimeStart">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="toolTip">
+                  <string>起始查询时间(包含)</string>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">/** 日期显示板 **/
+#qt_calendar_calendarview::item:hover {
+	color:rgba(70, 141, 211,0.7);
+	background: rgb(239, 239, 239);
+	border-radius: 10px;
+}
+#qt_calendar_calendarview::item {
+	border-radius: 10px;
+}
+#qt_calendar_calendarview::item:focus {
+	color: white;
+	background-color: rgba(70, 141, 211,0.7);
+}
+QCalendarWidget QAbstractItemView:enabled {
+	outline:none;
+	color:black;
+	background: white;
+
+}
+QCalendarWidget QAbstractItemView:disabled 
+{ 
+	color: rgb(179, 179, 179) ; 
+}
+/* 导航栏  及 导航栏中按钮设置*/
+
+#qt_calendar_navigationbar {
+	color: rgb(148, 148, 148);
+    background: white;
+}
+QToolButton{
+	color: rgb(81, 81, 81);
+    background: white;
+	qproperty-icon: none;
+
+}
+#qt_calendar_prevmonth{/*上一月*/
+	qproperty-text:'&lt;';
+	font:15px;
+	border-radius: 10px;
+}
+#qt_calendar_prevmonth:hover{/*上一月*/
+	color:rgba(70, 141, 211,0.7);
+}
+#qt_calendar_nextmonth{/*下一月*/
+	qproperty-text:'&gt;';
+	font:15px;
+	border-radius: 10px;
+}
+#qt_calendar_nextmonth:hover{
+	color:rgba(70, 141, 211,0.7);
+}
+/***************************************************/
+</string>
+                 </property>
+                 <property name="buttonSymbols">
+                  <enum>QAbstractSpinBox::PlusMinus</enum>
+                 </property>
+                 <property name="currentSection">
+                  <enum>QDateTimeEdit::YearSection</enum>
+                 </property>
+                 <property name="displayFormat">
+                  <string>yyyy/MM/dd</string>
+                 </property>
+                 <property name="calendarPopup">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_7">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Fixed</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>5</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_2">
+                 <property name="text">
+                  <string>止:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDateTimeEdit" name="dateTimeEnd">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="toolTip">
+                  <string>终止查询时间(包含)</string>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">/** 日期显示板 **/
+#qt_calendar_calendarview::item:hover {
+	color:rgba(70, 141, 211,0.7);
+	background: rgb(239, 239, 239);
+	border-radius: 10px;
+}
+#qt_calendar_calendarview::item {
+	border-radius: 10px;
+}
+#qt_calendar_calendarview::item:focus {
+	color: white;
+	background-color: rgba(70, 141, 211,0.7);
+}
+QCalendarWidget QAbstractItemView:enabled {
+	outline:none;
+	color:black;
+	background: white;
+
+}
+QCalendarWidget QAbstractItemView:disabled 
+{ 
+	color: rgb(179, 179, 179) ; 
+}
+/* 导航栏  及 导航栏中按钮设置*/
+
+#qt_calendar_navigationbar {
+	color: rgb(148, 148, 148);
+    background: white;
+}
+QToolButton{
+	color: rgb(81, 81, 81);
+    background: white;
+	qproperty-icon: none;
+
+}
+#qt_calendar_prevmonth{/*上一月*/
+	qproperty-text:'&lt;';
+	font:15px;
+	border-radius: 10px;
+}
+#qt_calendar_prevmonth:hover{/*上一月*/
+	color:rgba(70, 141, 211,0.7);
+}
+#qt_calendar_nextmonth{/*下一月*/
+	qproperty-text:'&gt;';
+	font:15px;
+	border-radius: 10px;
+}
+#qt_calendar_nextmonth:hover{
+	color:rgba(70, 141, 211,0.7);
+}
+/***************************************************/
+</string>
+                 </property>
+                 <property name="buttonSymbols">
+                  <enum>QAbstractSpinBox::PlusMinus</enum>
+                 </property>
+                 <property name="currentSection">
+                  <enum>QDateTimeEdit::YearSection</enum>
+                 </property>
+                 <property name="displayFormat">
+                  <string>yyyy/MM/dd</string>
+                 </property>
+                 <property name="calendarPopup">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_5">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>6</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="checkBoxDateUse">
+            <property name="maximumSize">
+             <size>
+              <width>20</width>
+              <height>22</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>使用日期</string>
+            </property>
+            <property name="statusTip">
+             <string/>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>13</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>1</number>
+           </property>
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>5</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="leQueryInput">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;- 直接输入 模糊查询笔记内容&lt;/p&gt;&lt;p&gt;- 在标签里输入SQL格式文本(目前有两种标签: @note , @tag)，两个标签之间可以用 and/or 连接&lt;/p&gt;&lt;p&gt;@note:[ 筛笔记条件 ] content 文本内容 / indate 日期时间&lt;/p&gt;&lt;p&gt;AND | OR &lt;/p&gt;&lt;p&gt;@tag:[ 筛选标签条件 ]&lt;/p&gt;&lt;p&gt;=例:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-family:'JetBrains Mono','monospace'; font-size:9.8pt; color:#808080;&quot;&gt;- @note:[content='&lt;/span&gt;&lt;span style=&quot; font-family:'宋体','monospace'; font-size:9.8pt; color:#808080;&quot;&gt;玩游戏&lt;/span&gt;&lt;span style=&quot; font-family:'JetBrains Mono','monospace'; font-size:9.8pt; color:#808080;&quot;&gt;']&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-family:'JetBrains Mono','monospace'; font-size:9.8pt; color:#808080;&quot;&gt;- @note:[(content='&lt;/span&gt;&lt;span style=&quot; font-family:'宋体','monospace'; font-size:9.8pt; color:#808080;&quot;&gt;上午在学作业&lt;/span&gt;&lt;span style=&quot; font-family:'JetBrains Mono','monospace'; font-size:9.8pt; color:#808080;&quot;&gt;' and indate like '2022-05-05%') or (content like '%&lt;/span&gt;&lt;span style=&quot; font-family:'宋体','monospace'; font-size:9.8pt; color:#808080;&quot;&gt;新闻联播结束%&lt;/span&gt;&lt;span style=&quot; font-family:'JetBrains Mono','monospace'; font-size:9.8pt; color:#808080;&quot;&gt;' and and indate='2022-05-06 19:30:00')]&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-family:'JetBrains Mono','monospace'; font-size:9.8pt; color:#808080;&quot;&gt;- @tag:[text='&lt;/span&gt;&lt;span style=&quot; font-family:'宋体','monospace'; font-size:9.8pt; color:#808080;&quot;&gt;日常&lt;/span&gt;&lt;span style=&quot; font-family:'JetBrains Mono','monospace'; font-size:9.8pt; color:#808080;&quot;&gt;']&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-family:'JetBrains Mono','monospace'; font-size:9.8pt; color:#808080;&quot;&gt;- @tag:[(text='&lt;/span&gt;&lt;span style=&quot; font-family:'宋体','monospace'; font-size:9.8pt; color:#808080;&quot;&gt;日常&lt;/span&gt;&lt;span style=&quot; font-family:'JetBrains Mono','monospace'; font-size:9.8pt; color:#808080;&quot;&gt;' and sort=1) or (text='&lt;/span&gt;&lt;span style=&quot; font-family:'宋体','monospace'; font-size:9.8pt; color:#808080;&quot;&gt;学习&lt;/span&gt;&lt;span style=&quot; font-family:'JetBrains Mono','monospace'; font-size:9.8pt; color:#808080;&quot;&gt;' and sort=3)]&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-family:'JetBrains Mono','monospace'; font-size:9.8pt; color:#808080;&quot;&gt;- @note:[content='小明'] OR @tag:[text='日常']&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="placeholderText">
+              <string>搜索</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnQuery">
+             <property name="maximumSize">
+              <size>
+               <width>22</width>
+               <height>22</height>
+              </size>
+             </property>
+             <property name="toolTip">
+              <string>搜索</string>
+             </property>
+             <property name="text">
+              <string>O</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>10</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>2</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QListWidget" name="listWidget">
+           <property name="toolTip">
+            <string/>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QListWidget  QScrollBar{
+	width:8px;
+    border: none;
+     background-color: rgba(40, 81, 121,0.2);
+}</string>
+           </property>
+           <property name="spacing">
+            <number>5</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>1</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="labelStatus">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>15</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color:rgb(199, 199, 199)</string>
+           </property>
+           <property name="text">
+            <string>共 0 条</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::LinksAccessibleByMouse</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>2</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+     <item row="0" column="0" colspan="2">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>5</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="labelTitle">
+           <property name="font">
+            <font>
+             <pointsize>15</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>笔记列表</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_6">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnRecovery">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>23</width>
+             <height>23</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>23</width>
+             <height>23</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>恢复</string>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>10</width>
+             <height>10</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnMax">
+           <property name="maximumSize">
+            <size>
+             <width>23</width>
+             <height>23</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="toolTip">
+            <string>最大化</string>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>10</width>
+             <height>10</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnClose">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>23</width>
+             <height>23</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>23</width>
+             <height>23</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="toolTip">
+            <string>关闭</string>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">#btnClose{
+	padding-bottom:2px
+}
+#btnClose:hover{
+	color:white;
+	border-radius: 2px;
+	background-color: rgba(223, 0, 0,0.8);
+}</string>
+           </property>
+           <property name="text">
+            <string>x</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>5</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>btnClose</sender>
+   <signal>clicked()</signal>
+   <receiver>CusNoteList</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>422</x>
+     <y>15</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>218</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnMax</sender>
+   <signal>clicked()</signal>
+   <receiver>CusNoteList</receiver>
+   <slot>showMaximized()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>399</x>
+     <y>15</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>218</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnRecovery</sender>
+   <signal>clicked()</signal>
+   <receiver>CusNoteList</receiver>
+   <slot>showNormal()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>376</x>
+     <y>15</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>218</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnRecovery</sender>
+   <signal>clicked()</signal>
+   <receiver>btnMax</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>376</x>
+     <y>15</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>15</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnMax</sender>
+   <signal>clicked()</signal>
+   <receiver>btnRecovery</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>399</x>
+     <y>15</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>376</x>
+     <y>15</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnMax</sender>
+   <signal>clicked()</signal>
+   <receiver>btnMax</receiver>
+   <slot>hide()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>399</x>
+     <y>15</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>15</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnRecovery</sender>
+   <signal>clicked()</signal>
+   <receiver>btnRecovery</receiver>
+   <slot>hide()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>376</x>
+     <y>15</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>376</x>
+     <y>15</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
