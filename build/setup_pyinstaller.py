@@ -4,8 +4,9 @@ from shutil import rmtree, copytree
 import PyInstaller.__main__
 
 # 获取相关路径
+projectName='TodayNotes'
 curpath = os.path.abspath(os.path.dirname(__file__))
-basedir = curpath[:curpath.find('TodayNotes') + 6]
+basedir = curpath[:curpath.find(projectName) + len(projectName)]
 print('当前路径:', curpath, '项目', basedir)
 # 复制资源文件到脚本路径
 sourceDir = basedir + '\\resource'
