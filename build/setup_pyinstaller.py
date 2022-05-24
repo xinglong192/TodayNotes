@@ -21,6 +21,5 @@ PyInstaller.__main__.run([
     '-n=note',
     '--windowed',
     '-i=./resource/images/note.ico',
-    '--upx-dir=D:/soft/UPX/upx-3.96-win64/upx.exe',
     basedir + '/mainView.py'
 ])
