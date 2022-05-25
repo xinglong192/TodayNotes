@@ -15,14 +15,14 @@ FORMAT_DATE_STR = 'yyyy-MM-dd'
 class CusNoteList(CusQWidget, Ui_CusNoteList):
     """ 笔记查询窗口 """
 
-    def __init__(self):
+    def __init__(self,parent=None):
 
         self.sdt = datetime.datetime.now()
         self.edt = datetime.datetime.now()
         self.usedate = True
         self.queryText = ''
 
-        super().__init__()
+        super().__init__(parent)
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setupUi(self)
         # 设置最大化和复原的图标
@@ -104,10 +104,10 @@ class CusNoteList(CusQWidget, Ui_CusNoteList):
     def __addNote(self, notes: list):
         self.listWidget.clear()
         for note in notes:
-            rlabel = CusRecordLabel(note[0], True)
+            rlabel = CusRecordLabel(note[0], True,self)
             rlabel.rcon = note[1]
             rlabel.rtime = note[2]
-            newItem = QListWidgetItem()
+            newItem = QListWidgetItem(self.listWidget)
             newItem.setSizeHint(rlabel.sizeHint())
             self.listWidget.addItem(newItem)
             self.listWidget.setItemWidget(newItem, rlabel)

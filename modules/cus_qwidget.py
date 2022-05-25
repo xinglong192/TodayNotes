@@ -6,8 +6,8 @@ from PySide6.QtWidgets import QWidget
 class CusQWidget(QWidget):
     """ 实现窗口拖动"""
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self,parent=None):
+        super().__init__(parent)
         self.setWindowFlags(Qt.CustomizeWindowHint)
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.ismoving = False

@@ -167,10 +167,10 @@ class MainWindow(CusQWidget, Ui_CusRecordView):
         res = DBManager.getDayNotes()
         self.recListWidget.clear()
         for r in res:
-            rlabel = CusRecordLabel(r[0])
+            rlabel = CusRecordLabel(rid=r[0],parent=self)
             rlabel.rcon = r[1]
             rlabel.rtime = r[2]
-            newItem = QListWidgetItem()
+            newItem = QListWidgetItem(self.recListWidget)
             newItem.setSizeHint(rlabel.sizeHint())
             self.recListWidget.addItem(newItem)
             self.recListWidget.setItemWidget(newItem, rlabel)

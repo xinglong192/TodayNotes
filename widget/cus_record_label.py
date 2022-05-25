@@ -18,8 +18,8 @@ def formatTime(d: str, showDate=False) -> str:
 
 class CusRecordLabel(QWidget, Ui_frameRecLabel):
 
-    def __init__(self, rid: int | str, showDate=False):
-        super().__init__()
+    def __init__(self, rid: int | str, showDate=False, parent=None):
+        super().__init__(parent)
         self.__showtime = None
         self.__rtime = None
         self.__rcon = None
@@ -81,5 +81,3 @@ class CusRecordLabel(QWidget, Ui_frameRecLabel):
         CusMsgBus.send('closeEditor', self.rid)
         CusMsgBus.send('load_rec_list')
         CusMsgBus.send('loadNoteList')
-
-
