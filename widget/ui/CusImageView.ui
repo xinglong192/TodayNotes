@@ -150,22 +150,5 @@
   </widget>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>CusImageView</sender>
-   <signal>destroyed()</signal>
-   <receiver>CusImageView</receiver>
-   <slot>deleteLater()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>254</x>
-     <y>218</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>254</x>
-     <y>218</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

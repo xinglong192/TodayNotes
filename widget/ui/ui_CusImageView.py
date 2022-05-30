@@ -87,7 +87,6 @@ class Ui_CusImageView(object):
         CusImageView.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(CusImageView)
-        CusImageView.destroyed.connect(CusImageView.deleteLater)
 
         QMetaObject.connectSlotsByName(CusImageView)
     # setupUi
