@@ -1,3 +1,4 @@
+import re
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -5,6 +6,7 @@ from pathlib import Path
 # import pytz
 from PySide6.QtSql import QSqlDatabase, QSqlQuery
 
+from .setting import root_path
 from .vdialog import VDialogType, VDialog
 
 FORMAT_TIME_STR = '%Y-%m-%d %H:%M:%S'
@@ -22,14 +24,37 @@ def timeToDat(time: str) -> str:
     return datetime.strptime(time, FORMAT_TIME_STR).strftime(FORMAT_DATE_STR)
 
 
+def html2text(html):
+    """ 仅适用与本项目特例 """
+
+    def format(t):
+        t = re.sub(r'(\n)', "", t)
+        # t = re.sub(r'(\t)', "", t)
+        t = re.sub(r'(\r)', "", t)
+        t = re.sub(r'<style.*</style>', "", t)
+        t = re.sub(r'<img src=[^>]* />', "[图片]", t)
+        t = re.sub(r'<p [^>]*>(.*)</p>', r"<p>\1</p>", t)
+        t = re.sub(r'</?[^>]*>', "", t)
+        # t = re.sub(r'(\s)', "", t)
+        return t
+
+    th = re.findall(r'(<p .*[^/]>.*</p>)', html)
+    res = ''
+    for t in th:
+        res += format(t)
+        res += '\n'
+    return res
+
+
 class DBManager:
     print('------------check database-----------')
     # 创建存储文件路径
-    Path('data/').mkdir(parents=True, exist_ok=True)
+    dbPath = root_path
+    Path(dbPath).mkdir(parents=True, exist_ok=True)
 
     # 链接数据库
     db = QSqlDatabase.addDatabase("QSQLITE")
-    db.setDatabaseName('data/notes.sqlite')
+    db.setDatabaseName(dbPath + 'notes.sqlite')
     ok = db.open()
     if not ok:
         VDialog.doSomething(VDialogType.Error, '创建数据文件失败,前检查文件夹权限')
@@ -97,6 +122,22 @@ class DBManager:
             query.exec("CREATE INDEX IF NOT EXISTS idx_rid ON RTREL (rid);")
             query.exec("CREATE INDEX IF NOT EXISTS idx_tid ON RTREL (tid);")
             query.prepare("INSERT INTO RTREL (rid,tid,sort)VALUES (1,1,0)")
+            query.exec()
+
+            print('------------create table RTREL-----------' + str(f))
+
+    # 查询attachfile表是否存在
+    if query.exec("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='ATTACHFILE'"):
+        query.next()
+        if query.value(0) < 1:
+            f = query.exec(
+                """CREATE TABLE IF NOT EXISTS ATTACHFILE(
+                   fid VARCHAR(32) PRIMARY KEY,
+                   rid INTEGER NOT NULL,
+                   file BLOB NOT NULL,
+                   suffix VARCHAR(10) DEFAULT 'PNG'
+                );""")
+            query.exec("CREATE INDEX IF NOT EXISTS idx_rid ON ATTACHFILE (rid);")
             query.exec()
 
             print('------------create table RTREL-----------' + str(f))
@@ -302,6 +343,7 @@ class DBManager:
     def __transition_condition(condition: dict):
         # 查询器输入文本
         conQuery = condition.get('conQuery', '')
+        conQuery.strip()
         # 时间控件值
         today = datetime.now().strftime(FORMAT_DATE_STR)
         indate = condition.get('indate', [today, today])
@@ -311,10 +353,30 @@ class DBManager:
         # 无@符号 或者都转义了 则认为是 查询笔记内容
         if conQuery:
             if all([(item[-1] == '\\') if len(item) > 0 else False for item in conQuery.split('@')[:-1]]):
-                sql += f"AND content LIKE '%{conQuery}%'"
+                if conQuery == '图片':
+                    sql += r"AND (content LIKE '%图片%' OR content LIKE '%<img %')"
+                else:
+                    sql += f"AND content LIKE '%{conQuery}%'"
+            elif conQuery.find('@note:') > 0 or conQuery.find('@tag:') > 0:
+                ni = conQuery.find('@note:')
+                ti = conQuery.find('@tag:')
+                if ni == -1:
+                    ni = len(conQuery)
+                if ti == -1:
+                    ti = len(conQuery)
+                ti = conQuery[:min(ni, ti)]
+                ti = ti.strip()
+                if ti.upper().endswith('OR') or ti.upper().endswith('AND'):
+                    ti = ti[:-2 if ti.upper().endswith('OR') else -3].strip()
+
+                if ti == '图片':
+                    sql += r"AND (content LIKE '%图片%' OR content LIKE '%<img %')"
+                else:
+                    sql += f"AND content LIKE '%{ti}%'"
+
             if '@note:' in conQuery:
                 # e.g.
-                # @note:[content='玩游戏']
+                # @note:[content like '%玩游戏%']
                 # @note:[(content='上午在学作业' and indate like '2022-05-05%') or (content='新闻联播结束' and and indate='2022-05-06 19:30:00')]
                 nsp = conQuery.find('@note:') + 6
                 nep = conQuery.find(']', nsp + 1)
@@ -325,17 +387,57 @@ class DBManager:
                     sql += f"{a_o} {text}"
             if '@tag:' in conQuery:
                 # e.g.
+                # @tag:日常
                 # @tag:[text='日常']
                 # @tag:[(text='日常' and sort=1) or (text='学习' and sort=3)]
                 tsp = conQuery.find('@tag:') + 5
                 tep = conQuery.find(']', tsp + 1)
+                tts = conQuery[max(0, conQuery[:tsp].rfind(']')):tsp].upper()
+                a_o = 'OR' if 'OR' in tts else 'AND'
                 if tep != -1:
-                    tts = conQuery[max(0, conQuery[:tsp].rfind(']')):tsp].upper()
-                    a_o = 'OR' if 'OR' in tts else 'AND'
                     text = conQuery[tsp + 1:tep]
                     sql += f" {a_o} rid IN (SELECT rid FROM RTREL JOIN TAGS ON RTREL.tid = TAGS.tid WHERE 1=1 AND {text} )"
+                elif conQuery.find('[', tsp - 1) == -1:
+                    text = conQuery[tsp:]
+                    sql += f" {a_o} rid IN (SELECT rid FROM RTREL JOIN TAGS ON RTREL.tid = TAGS.tid WHERE 1=1 AND text like '%{text}%' )"
+
         if usedate:
             # XXX 手动加入时分秒
             sql += f"AND indate BETWEEN '{indate[0] + ' 00:00:00'}' AND '{indate[1] + ' 23:59:59'}'"
 
         return sql
+
+    @staticmethod
+    def getFileByRid(rid):
+        q = DBManager.query
+        q.prepare('SELECT fid,rid,file,suffix FROM ATTACHFILE WHERE rid= :rid')
+        q.bindValue(':rid', rid)
+        q.exec()
+        res = []
+        cols = q.record().count()
+        while q.next():
+            res.append([q.value(i) for i in range(cols)])
+        return res
+
+    @staticmethod
+    def saveFile(data: list):
+        """
+        保存附件
+        data:[[fid,rid,file,suffix],[...]]
+        """
+        if not data:
+            return False
+        q = DBManager.query
+        q.prepare('INSERT INTO ATTACHFILE (fid,rid,file,suffix) VALUES(?,?,?,?)')
+        q.addBindValue([d[0] for d in data])
+        q.addBindValue([d[1] for d in data])
+        q.addBindValue([d[2] for d in data])
+        q.addBindValue([d[3] for d in data])
+        return q.execBatch()
+
+    @staticmethod
+    def delFileByRid(rid):
+        q = DBManager.query
+        q.prepare('DELETE FROM ATTACHFILE WHERE rid= :rid')
+        q.bindValue(':rid', rid)
+        q.exec()

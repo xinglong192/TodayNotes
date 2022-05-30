@@ -23,7 +23,6 @@ class CusQWidget(QWidget):
         e.accept()
 
     def mouseMoveEvent(self, e: QMouseEvent):
-        screen=QGuiApplication.primaryScreen().availableGeometry()
         if self.ismoving:
             relpos = e.globalPosition().toPoint() - self.start_point
             self.move(relpos)

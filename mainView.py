@@ -1,14 +1,14 @@
-import configparser
-import os
 import sys
 
 from PySide6.QtCore import QCoreApplication, Slot, Qt
 from PySide6.QtGui import QIcon, QAction, QCursor
 from PySide6.QtWidgets import QApplication, QSystemTrayIcon, QMenu, QStyle, QListWidgetItem
 
+from modules import setting
 from modules.cus_msg_bus import CusMsgBus
 from modules.cus_qwidget import CusQWidget
 from modules.db_manager import DBManager
+from modules.setting import update_conf
 from modules.vdialog import VDialog, VDialogType
 from ui_CusRecordView import Ui_CusRecordView
 from widget.cus_note_edit import CusNoteEdit
@@ -16,59 +16,21 @@ from widget.cus_note_list import CusNoteList
 from widget.cus_record_label import CusRecordLabel
 from widget.cus_suspend_ball import CusSuspendBall
 
-default_close_flag = '0'  # 关闭按钮的标识(0:无/1:关闭程序/2:最小化到托盘)
-default_sball_flag = '0'  # 最小化至托盘后是否显示悬浮球 (0:无-未设置/1:手动显示/2:自动显示)
-confFile = 'data/conf.ini'
-con = configparser.ConfigParser()
-
-
-def update_conf(sec: str, opt: str, val: str) -> None:
-    """ 更新配置文件中键值 """
-    if os.path.exists(confFile) and con.has_section(sec):
-        con.read(confFile)
-        con.set(sec, opt, val)
-        con.write(open(file=confFile, mode='r+', encoding='utf8'))
-        return
-    con.add_section(sec)
-    con.set(sec, opt, val)
-    con.write(open(file=confFile, mode='a', encoding='utf8'))
-
-
-# 读取配置文件
-if os.path.exists(confFile):
-    con.read(confFile, 'utf-8')
-    # 读按钮标识配置
-    if con.has_option('base', 'default_close_flag'):
-        baseItems = dict(con.items('base'))
-        default_close_flag = baseItems.get('default_close_flag', '0')
-    else:
-        update_conf('base', 'default_close_flag', '0')
-    # 读悬浮球标识配置
-    if con.has_option('base', 'default_sball_flag'):
-        baseItems = dict(con.items('base'))
-        default_sball_flag = baseItems.get('default_sball_flag', '0')
-    else:
-        update_conf('base', 'default_sball_flag', '0')
-else:
-    if not os.path.exists('data'):
-        os.makedirs('data')
-    update_conf('base', 'default_close_flag', '0')
-    update_conf('base', 'default_sball_flag', '0')
-
 
 class MainWindow(CusQWidget, Ui_CusRecordView):
     """ 主窗口 -- 今日笔记列表"""
 
     def __init__(self):
         super(MainWindow, self).__init__()
+        self.setAttribute(Qt.WA_DeleteOnClose, False)  # 主窗体 不销毁
         self.setupUi(self)
         self.edit_views = {}  # 已打开的编辑窗口
-        self.load_rec_list()
+
         self.regMsgBus()
         self.spdBall = None
         self.setTray()
         self.setRightMenu()
-        self.setAttribute(Qt.WA_DeleteOnClose, False)  # 主窗体 不销毁
+        self.load_rec_list()
 
     def regMsgBus(self):
         CusMsgBus.append('load_rec_list', self)
@@ -133,7 +95,6 @@ class MainWindow(CusQWidget, Ui_CusRecordView):
 
         sBallAction = QAction(self.style().standardIcon(QStyle.SP_DialogYesButton), '打开悬浮球')
         sBallAction.setParent(trayMmenu)
-        # sBallAction.triggered.connect(self.showSball)
 
         quitAction = QAction(self.style().standardIcon(QStyle.SP_BrowserStop), '退出')
         quitAction.setParent(trayMmenu)
@@ -167,7 +128,7 @@ class MainWindow(CusQWidget, Ui_CusRecordView):
         res = DBManager.getDayNotes()
         self.recListWidget.clear()
         for r in res:
-            rlabel = CusRecordLabel(rid=r[0],parent=self)
+            rlabel = CusRecordLabel(rid=r[0], parent=self)
             rlabel.rcon = r[1]
             rlabel.rtime = r[2]
             newItem = QListWidgetItem(self.recListWidget)
@@ -198,20 +159,19 @@ class MainWindow(CusQWidget, Ui_CusRecordView):
 
     @Slot()
     def on_btnExit_clicked(self):
-        global default_close_flag
         res = (-1, 0)
-        if default_close_flag == '0':
+        if setting.default_close_flag == '0':
             res = VDialog.doSomething(VDialogType.Choose, '关闭', "是否关闭程序", "记住我的选择", "退出程序", "最小化至托盘")
             if res[0] == -1:
                 return
             if res[1]:
-                default_close_flag = '1' if res[0] else '2'
-                update_conf('base', 'default_close_flag', default_close_flag)
-        if default_close_flag == '1' or (res and res[0] == 1):
+                setting.default_close_flag = '1' if res[0] else '2'
+                update_conf('base', 'default_close_flag', setting.default_close_flag)
+        if setting.default_close_flag == '1' or (res and res[0] == 1):
             self.quitApp()
         else:
             self.close()
-            if default_sball_flag == '2':
+            if setting.default_sball_flag == '2':
                 self.showSball()
 
     @Slot()
@@ -219,17 +179,16 @@ class MainWindow(CusQWidget, Ui_CusRecordView):
         CusNoteList().show()
 
     def showSball(self):
-        global default_sball_flag
         res = (-1, 0)
-        if default_sball_flag == '0' or default_sball_flag == '3':
+        if setting.default_sball_flag == '0' or setting.default_sball_flag == '3':
             res = VDialog.doSomething(VDialogType.Choose, '悬浮球', "是否在最小化至托盘时开启悬浮球", "记住我的选择", "手动开启", "最小化时开启")
             if res[0] == -1:
                 return
             if res[1]:
-                default_sball_flag = '1' if res[0] else '2'
-                update_conf('base', 'default_sball_flag', default_sball_flag)
-        if default_sball_flag == '1' or default_sball_flag == '2' or res[0] != -1:
-            if not hasattr(self, 'spdBall') or self.spdBall is None :
+                setting.default_sball_flag = '1' if res[0] else '2'
+                update_conf('base', 'default_sball_flag', setting.default_sball_flag)
+        if setting.default_sball_flag == '1' or setting.default_sball_flag == '2' or res[0] != -1:
+            if not hasattr(self, 'spdBall') or self.spdBall is None:
                 self.spdBall = CusSuspendBall()
             self.spdBall.show()
 

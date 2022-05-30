@@ -209,7 +209,6 @@ class CusSuspendBall(QWidget):
         self.isLeave = False
         screen = QGuiApplication.primaryScreen().availableGeometry()
         cpos = self.pos()
-        # print(e.globalPosition().toPoint(), e.position(), screen.width(), screen.height())
         mpos = e.position()
         # 鼠标是否在左加号
         if 23 * self.scr <= mpos.x() <= 63 * self.scr and 23 * self.scr <= mpos.y() <= 63 * self.scr:

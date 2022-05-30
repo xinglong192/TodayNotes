@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 
 from PySide6.QtCore import Qt, Slot
@@ -5,7 +6,7 @@ from PySide6.QtGui import QMouseEvent, QFontMetrics, QResizeEvent, QCursor, QAct
 from PySide6.QtWidgets import QWidget, QStyle, QMenu
 
 from modules.cus_msg_bus import CusMsgBus
-from modules.db_manager import DBManager
+from modules.db_manager import DBManager, html2text
 from modules.vdialog import VDialog, VDialogType
 from widget.ui.ui_CusRecLabel import Ui_frameRecLabel
 
@@ -14,6 +15,8 @@ def formatTime(d: str, showDate=False) -> str:
     if showDate:
         return datetime.strptime(d, '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d %H:%M:%S')
     return datetime.strptime(d, '%Y-%m-%d %H:%M:%S').strftime('%H:%M:%S')
+
+
 
 
 class CusRecordLabel(QWidget, Ui_frameRecLabel):
@@ -36,6 +39,8 @@ class CusRecordLabel(QWidget, Ui_frameRecLabel):
 
     @rcon.setter
     def rcon(self, c: str):
+        if '<html>' in c:
+            c = html2text(c)
         self.__rcon = c
         width = self.size().width() - 1
         fm = QFontMetrics(self.labelContent.font())

@@ -8,11 +8,11 @@ from widget.ui.ui_CusInputBox import Ui_CusInputBox
 class CusInputBox(QDialog, Ui_CusInputBox):
     __cur_box = None
 
-    def __init__(self, tf=False):
-        super().__init__()
+    def __init__(self, tf=False, parent=None):
+        super().__init__(parent)
+        self.setAttribute(Qt.WA_DeleteOnClose)
         self.ismoving = False
         self.setupUi(self)
-        self.setAttribute(Qt.WA_DeleteOnClose)
         if not tf:
             self.setWindowFlags(Qt.CustomizeWindowHint)
         self.res = ()
@@ -28,8 +28,8 @@ class CusInputBox(QDialog, Ui_CusInputBox):
         self.reject()
 
     @staticmethod
-    def getText(title=None, pht='请输入'):
-        CusInputBox.__cur_box = CusInputBox(title)
+    def getText(title=None, pht='请输入', parent=None):
+        CusInputBox.__cur_box = CusInputBox(title, parent)
         if title:
             CusInputBox.__cur_box.setWindowTitle(title)
         if pht:
