@@ -34,15 +34,16 @@ def html2text(html):
         t = re.sub(r'<style.*</style>', "", t)
         t = re.sub(r'<img src=[^>]* />', "[图片]", t)
         t = re.sub(r'<p [^>]*>(.*)</p>', r"<p>\1</p>", t)
+        t = t.replace("</p>", "\n</p>")
         t = re.sub(r'</?[^>]*>', "", t)
         # t = re.sub(r'(\s)', "", t)
         return t
 
-    th = re.findall(r'(<p .*[^/]>.*</p>)', html)
+    # th = re.findall(r'(<p [^>]*>.*</p>)', html)
+    th = re.findall(r'(<body [^>]*>[\s\S]*</body>)', html)
     res = ''
     for t in th:
         res += format(t)
-        res += '\n'
     return res
 
 
@@ -428,6 +429,8 @@ class DBManager:
         if not data:
             return False
         q = DBManager.query
+        for rid in set(d[1] for d in data):
+            DBManager.delFileByRid(rid)
         q.prepare('INSERT INTO ATTACHFILE (fid,rid,file,suffix) VALUES(?,?,?,?)')
         q.addBindValue([d[0] for d in data])
         q.addBindValue([d[1] for d in data])

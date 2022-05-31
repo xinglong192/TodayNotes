@@ -1,4 +1,3 @@
-import re
 from datetime import datetime
 
 from PySide6.QtCore import Qt, Slot
@@ -17,12 +16,11 @@ def formatTime(d: str, showDate=False) -> str:
     return datetime.strptime(d, '%Y-%m-%d %H:%M:%S').strftime('%H:%M:%S')
 
 
-
-
 class CusRecordLabel(QWidget, Ui_frameRecLabel):
 
     def __init__(self, rid: int | str, showDate=False, parent=None):
         super().__init__(parent)
+        self.setAttribute(Qt.WA_DeleteOnClose)
         self.__showtime = None
         self.__rtime = None
         self.__rcon = None
@@ -31,7 +29,6 @@ class CusRecordLabel(QWidget, Ui_frameRecLabel):
         self.rid = rid
         self.setupUi(self)
         self.setWindowFlags(Qt.FramelessWindowHint)
-        self.setAttribute(Qt.WA_DeleteOnClose)
 
     @property
     def rcon(self):
@@ -83,6 +80,8 @@ class CusRecordLabel(QWidget, Ui_frameRecLabel):
         if not res:
             return
         DBManager.delNote(self.rid)
+        DBManager.delFileByRid(self.rid)
         CusMsgBus.send('closeEditor', self.rid)
         CusMsgBus.send('load_rec_list')
         CusMsgBus.send('loadNoteList')
+        self.close()

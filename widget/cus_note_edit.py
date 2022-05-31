@@ -5,8 +5,8 @@ import uuid
 
 from PySide6.QtCore import Slot, QMimeData, QBuffer, QByteArray, QIODevice, QUrl
 from PySide6.QtGui import QDropEvent, QImage, QImageReader, QTextDocument, QAction, QCursor, Qt, \
-    QMouseEvent, QDesktopServices
-from PySide6.QtWidgets import QListWidgetItem, QFileDialog, QMainWindow
+    QMouseEvent, QDesktopServices, QTextCursor
+from PySide6.QtWidgets import QListWidgetItem, QFileDialog
 
 from modules.cus_msg_bus import CusMsgBus
 from modules.cus_qwidget import CusQWidget
@@ -22,8 +22,9 @@ from widget.ui.ui_CusNoteEdit import Ui_CusNoteEdit
 class CusNoteEdit(CusQWidget, Ui_CusNoteEdit):
     """ 笔记编辑窗口 """
 
-    def __init__(self, rid,parent=None):
+    def __init__(self, rid, parent=None):
         super().__init__(parent)
+        self.mouseOnImgMove = False
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.images = {}
         self.con = ''
@@ -42,6 +43,7 @@ class CusNoteEdit(CusQWidget, Ui_CusNoteEdit):
         self.textEdit.canInsertFromMimeData = self.canInsertFromMimeData(self.textEdit.canInsertFromMimeData)
         self.textEdit.contextMenuEvent = self.textEditContextMenu
         self.textEdit.mouseReleaseEvent = self.textEditMouseRelease(self.textEdit.mouseReleaseEvent)
+        self.textEdit.mouseMoveEvent = self.textEditMouseMove(self.textEdit.mouseMoveEvent)
 
         self.textEdit.setFocus()
 
@@ -156,6 +158,7 @@ class CusNoteEdit(CusQWidget, Ui_CusNoteEdit):
 
     @Slot()
     def on_btnCommit_clicked(self):
+
         dt = self.dateTimeEdit.dateTime().toString('yyyy-MM-dd HH:mm:ss')
         con = self.textEdit.toHtml()
         data = {'content': con, 'indate': dt, 'tags': self.tags}
@@ -187,7 +190,7 @@ class CusNoteEdit(CusQWidget, Ui_CusNoteEdit):
     @Slot()
     def on_btnAddTag_clicked(self):
 
-        text = CusInputBox.getText('创建标签', '标签名',self)
+        text = CusInputBox.getText('创建标签', '标签名', self)
 
         if not text or not text[1] or not text[0]:
             return
@@ -203,6 +206,11 @@ class CusNoteEdit(CusQWidget, Ui_CusNoteEdit):
     @Slot()
     def on_textEdit_textChanged(self):
         con = self.textEdit.toHtml()
+        # 如果发生删除时，从self.images里删除被移除的图片
+        imgs = re.findall(r'<img src="([^"]*)" />', con)
+        difimgids = self.images.keys() - set(imgs)
+        for ids in difimgids:
+            self.images.pop(ids, None)
         if con != self.con:
             self.modifyStatus('textEdit')
         else:
@@ -272,6 +280,10 @@ class CusNoteEdit(CusQWidget, Ui_CusNoteEdit):
             elif source.hasUrls():
                 for url in source.urls():
                     path = url.toLocalFile()
+                    if not path:
+                        # 说明可能不是本地文件，而是新创建的链接
+                        func(source)
+                        continue
                     suffix = path[path.rfind('.') + 1:]
                     if suffix in QImageReader.supportedImageFormats():
                         image = QImage(path)
@@ -285,7 +297,6 @@ class CusNoteEdit(CusQWidget, Ui_CusNoteEdit):
                                 self.textEdit.textCursor().insertText(f.read())
                         except Exception as e:
                             VDialog.doSomething(VDialogType.Error, f'发生错误:{e}')
-
             else:
                 func(source)
 
@@ -322,20 +333,43 @@ class CusNoteEdit(CusQWidget, Ui_CusNoteEdit):
 
     """ ↑↑↑↑↑ images funcs end ↑↑↑↑↑↑ """
 
+    def textEditMouseMove(self, func):
+        def inner(e: QMouseEvent):
+            if not self.mouseOnImgMove and e.buttons() == Qt.LeftButton:
+                self.mouseOnImgMove = True
+            func(e)
+
+        return inner
+
     def textEditMouseRelease(self, func):
         def inner(e: QMouseEvent):
-            if e.button() != Qt.LeftButton:
+            if e.button() == Qt.RightButton:
+                self.mouseOnImgMove = False
+                url = self.textEdit.anchorAt(e.pos())
+                if url and url in self.images:
+                    if not self.textEdit.textCursor().hasSelection():
+                        cursor = self.textEdit.cursorForPosition(e.pos())
+                        cursor.select(QTextCursor.WordUnderCursor)
+                        self.textEdit.setTextCursor(cursor)
+
                 func(e)
                 return
+            if e.button() != Qt.LeftButton:
+                self.mouseOnImgMove = False
+                func(e)
+                return
+            if self.mouseOnImgMove:
+                func(e)
+                return
+            self.mouseOnImgMove = False
             url = self.textEdit.anchorAt(e.pos())
-
             if url and url in self.images:
                 if use_cus_view == '0':
-                    tmpFilePath=os.path.abspath(temp_path_images+f'/temp{url}.{self.images[url][1]}')
-                    with open(tmpFilePath,'wb') as imgFile:
+                    tmpFilePath = os.path.abspath(temp_path_images + f'/temp{url}.{self.images[url][1]}')
+                    with open(tmpFilePath, 'wb') as imgFile:
                         imgFile.write(self.images[url][0].data())
 
-                    QDesktopServices.openUrl(QUrl("file:///"+tmpFilePath, QUrl.TolerantMode))
+                    QDesktopServices.openUrl(QUrl("file:///" + tmpFilePath, QUrl.TolerantMode))
                 else:
                     img = QImage()
                     img.loadFromData(self.images[url][0], self.images[url][1])
@@ -343,11 +377,16 @@ class CusNoteEdit(CusQWidget, Ui_CusNoteEdit):
                     iv.setLabelImage(img, self.images[url][1])
                     iv.show()
 
-
             func(e)
 
         return inner
 
-    def close(self) -> bool:
+    def closeEvent(self, event) -> None:
         CusMsgBus.quit('delTag', self)
-        return super(CusNoteEdit, self).close()
+        self.listWidgeTags.dropEvent = None
+        self.textEdit.insertFromMimeData = None
+        self.textEdit.canInsertFromMimeData = None
+        self.textEdit.contextMenuEvent = None
+        self.textEdit.mouseReleaseEvent = None
+        self.textEdit.mouseMoveEvent = None
+        super(CusNoteEdit, self).closeEvent(event)

@@ -15,7 +15,7 @@ FORMAT_DATE_STR = 'yyyy-MM-dd'
 class CusNoteList(CusQWidget, Ui_CusNoteList):
     """ 笔记查询窗口 """
 
-    def __init__(self,parent=None):
+    def __init__(self, parent=None):
 
         self.sdt = datetime.datetime.now()
         self.edt = datetime.datetime.now()
@@ -43,7 +43,6 @@ class CusNoteList(CusQWidget, Ui_CusNoteList):
         self.loadNoteList()
         self.listWidget.setFocus()
         CusMsgBus.append('loadNoteList', self)
-
 
     def dateRightClickedMenu(self, e):
         if self.dateTimeEdit.isHidden():
@@ -104,7 +103,7 @@ class CusNoteList(CusQWidget, Ui_CusNoteList):
     def __addNote(self, notes: list):
         self.listWidget.clear()
         for note in notes:
-            rlabel = CusRecordLabel(note[0], True,self)
+            rlabel = CusRecordLabel(note[0], True, self)
             rlabel.rcon = note[1]
             rlabel.rtime = note[2]
             newItem = QListWidgetItem(self.listWidget)
@@ -112,6 +111,10 @@ class CusNoteList(CusQWidget, Ui_CusNoteList):
             self.listWidget.addItem(newItem)
             self.listWidget.setItemWidget(newItem, rlabel)
 
-    def close(self) -> bool:
+    def closeEvent(self, event) -> None:
         CusMsgBus.quit('loadNoteList', self)
-        return super(CusNoteList, self).close()
+        self.dateTimeEdit.contextMenuEvent = None
+        self.dateIntervalWidget.contextMenuEvent = None
+        self.dateTimeStart.contextMenuEvent = None
+        self.dateTimeEnd.contextMenuEvent = None
+        super(CusNoteList, self).closeEvent(event)

@@ -118,3 +118,11 @@ class CusImageView(QMainWindow, Ui_CusImageView):
 
         # if oldSclVal != self.scaleVal:
         self.LabImage.update()
+
+    def closeEvent(self, event) -> None:
+        self.LabImage.wheelEvent = None
+        self.LabImage.paintEvent = None
+        self.LabImage.mousePressEvent = None
+        self.LabImage.mouseReleaseEvent = None
+        self.LabImage.mouseMoveEvent = None
+        super(CusImageView, self).closeEvent(event)
