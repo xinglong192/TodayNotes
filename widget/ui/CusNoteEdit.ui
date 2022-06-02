@@ -231,6 +231,9 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="mouseTracking">
+            <bool>false</bool>
+           </property>
            <property name="placeholderText">
             <string>请输入笔记内容</string>
            </property>

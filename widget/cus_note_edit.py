@@ -3,7 +3,7 @@ import os
 import re
 import uuid
 
-from PySide6.QtCore import Slot, QMimeData, QBuffer, QByteArray, QIODevice, QUrl
+from PySide6.QtCore import Slot, QMimeData, QBuffer, QByteArray, QIODevice, QUrl, QPoint
 from PySide6.QtGui import QDropEvent, QImage, QImageReader, QTextDocument, QAction, QCursor, Qt, \
     QMouseEvent, QDesktopServices, QTextCursor
 from PySide6.QtWidgets import QListWidgetItem, QFileDialog
@@ -24,6 +24,7 @@ class CusNoteEdit(CusQWidget, Ui_CusNoteEdit):
 
     def __init__(self, rid, parent=None):
         super().__init__(parent)
+        self.editMovePos = QPoint(0, 0)
         self.mouseOnImgMove = False
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.images = {}
@@ -44,6 +45,7 @@ class CusNoteEdit(CusQWidget, Ui_CusNoteEdit):
         self.textEdit.contextMenuEvent = self.textEditContextMenu
         self.textEdit.mouseReleaseEvent = self.textEditMouseRelease(self.textEdit.mouseReleaseEvent)
         self.textEdit.mouseMoveEvent = self.textEditMouseMove(self.textEdit.mouseMoveEvent)
+        self.textEdit.mousePressEvent = self.textEditMousePress(self.textEdit.mousePressEvent)
 
         self.textEdit.setFocus()
 
@@ -87,8 +89,6 @@ class CusNoteEdit(CusQWidget, Ui_CusNoteEdit):
 
             if res.get('content'):
                 ht = res['content']
-                # 图片添加超链接
-                ht = re.sub('(<img src="([^"]*)" />)', r'<a href="\2">\1</a>', ht)
                 self.textEdit.setHtml(ht)
 
             self.tags = [t['tid'] for t in res['tags']]
@@ -162,6 +162,11 @@ class CusNoteEdit(CusQWidget, Ui_CusNoteEdit):
         dt = self.dateTimeEdit.dateTime().toString('yyyy-MM-dd HH:mm:ss')
         con = self.textEdit.toHtml()
         data = {'content': con, 'indate': dt, 'tags': self.tags}
+        # 从self.images里删除被移除的图片
+        imgs = re.findall(r'<img src="([^"]*)" />', con)
+        difimgids = self.images.keys() - set(imgs)
+        for ids in difimgids:
+            self.images.pop(ids, None)
         if self.rid:
             DBManager.modifyNote(self.rid, data)
             self.saveImagesToDB()
@@ -206,11 +211,10 @@ class CusNoteEdit(CusQWidget, Ui_CusNoteEdit):
     @Slot()
     def on_textEdit_textChanged(self):
         con = self.textEdit.toHtml()
-        # 如果发生删除时，从self.images里删除被移除的图片
-        imgs = re.findall(r'<img src="([^"]*)" />', con)
-        difimgids = self.images.keys() - set(imgs)
-        for ids in difimgids:
-            self.images.pop(ids, None)
+        # 找出新插入的图片添加链接
+        recon = self.addImgsHref(con)
+        if recon != con:
+            self.textEdit.setHtml(recon)
         if con != self.con:
             self.modifyStatus('textEdit')
         else:
@@ -223,6 +227,13 @@ class CusNoteEdit(CusQWidget, Ui_CusNoteEdit):
             self.modifyStatus('dateTime')
         else:
             self.modifyStatus('dateTime', False)
+
+    def addImgsHref(self, con):
+        diffImgs = set(re.findall(r'<img src="([^"]*)" />', con)) - set(
+            re.findall(r'<a href=[^>]*><img src="([^"]*)" /></a>', con))
+        for iid in diffImgs:
+            con = re.sub(f'(<img src="{iid}" />)', f' <a href="{iid}">\\1</a> ', con)
+        return con
 
     def textEditContextMenu(self, e):
         menu = self.textEdit.createStandardContextMenu()
@@ -313,7 +324,7 @@ class CusNoteEdit(CusQWidget, Ui_CusNoteEdit):
     def loadImages(self, image: QImage, url, end="PNG"):
         """ 加载资源数据 """
         self.saveImages(image, url.toString(), end)
-        image = image.scaled(50, 50, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+        image = image.scaled(30, 30, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
         self.textEdit.document().addResource(QTextDocument.ImageResource, url, image)
 
     def saveImages(self, image: QImage, imgid: str, end="PNG"):
@@ -329,14 +340,23 @@ class CusNoteEdit(CusQWidget, Ui_CusNoteEdit):
             if not rid:
                 rid = self.rid
             DBManager.saveFile([[imgid, rid, self.images[imgid][0], self.images[imgid][1]] for imgid in self.images])
-        self.images.clear()
+        # self.images.clear()
 
     """ ↑↑↑↑↑ images funcs end ↑↑↑↑↑↑ """
+
+    def textEditMousePress(self, func):
+        def inner(e: QMouseEvent):
+            if e.button() == Qt.LeftButton:
+                self.editMovePos = e.pos()
+            func(e)
+
+        return inner
 
     def textEditMouseMove(self, func):
         def inner(e: QMouseEvent):
             if not self.mouseOnImgMove and e.buttons() == Qt.LeftButton:
-                self.mouseOnImgMove = True
+                if not (abs(e.pos().x() - self.editMovePos.x()) < 3 and abs(e.pos().y() - self.editMovePos.y()) < 3):
+                    self.mouseOnImgMove = True
             func(e)
 
         return inner
@@ -359,9 +379,9 @@ class CusNoteEdit(CusQWidget, Ui_CusNoteEdit):
                 func(e)
                 return
             if self.mouseOnImgMove:
+                self.mouseOnImgMove = False
                 func(e)
                 return
-            self.mouseOnImgMove = False
             url = self.textEdit.anchorAt(e.pos())
             if url and url in self.images:
                 if use_cus_view == '0':
@@ -389,4 +409,5 @@ class CusNoteEdit(CusQWidget, Ui_CusNoteEdit):
         self.textEdit.contextMenuEvent = None
         self.textEdit.mouseReleaseEvent = None
         self.textEdit.mouseMoveEvent = None
+        self.textEdit.mousePressEvent = None
         super(CusNoteEdit, self).closeEvent(event)

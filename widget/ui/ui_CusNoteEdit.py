@@ -8,12 +8,17 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QMetaObject, QSize, QTime, Qt)
-from PySide6.QtGui import (QFont)
-from PySide6.QtWidgets import (QAbstractItemView, QDateTimeEdit, QFrame,
-                               QGridLayout, QHBoxLayout, QLabel, QListView,
-                               QListWidget, QPushButton, QSizePolicy,
-                               QSpacerItem, QTextEdit, QVBoxLayout)
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QDateTimeEdit, QFrame,
+    QGridLayout, QHBoxLayout, QLabel, QListView,
+    QListWidget, QListWidgetItem, QPushButton, QSizePolicy,
+    QSpacerItem, QTextEdit, QVBoxLayout, QWidget)
 
 class Ui_CusNoteEdit(object):
     def setupUi(self, CusNoteEdit):
@@ -100,6 +105,7 @@ class Ui_CusNoteEdit(object):
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.textEdit.sizePolicy().hasHeightForWidth())
         self.textEdit.setSizePolicy(sizePolicy1)
+        self.textEdit.setMouseTracking(False)
 
         self.verticalLayout_3.addWidget(self.textEdit)
 
