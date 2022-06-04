@@ -5,7 +5,7 @@ import uuid
 
 from PySide6.QtCore import Slot, QMimeData, QBuffer, QByteArray, QIODevice, QUrl, QPoint
 from PySide6.QtGui import QDropEvent, QImage, QImageReader, QTextDocument, QAction, QCursor, Qt, \
-    QMouseEvent, QDesktopServices, QTextCursor
+    QMouseEvent, QDesktopServices, QTextCursor, QKeyEvent
 from PySide6.QtWidgets import QListWidgetItem, QFileDialog
 
 from modules.cus_msg_bus import CusMsgBus
@@ -24,6 +24,7 @@ class CusNoteEdit(CusQWidget, Ui_CusNoteEdit):
 
     def __init__(self, rid, parent=None):
         super().__init__(parent)
+        self.ctrlPress = False
         self.editMovePos = QPoint(0, 0)
         self.mouseOnImgMove = False
         self.setAttribute(Qt.WA_DeleteOnClose)
@@ -282,6 +283,8 @@ class CusNoteEdit(CusQWidget, Ui_CusNoteEdit):
         return inner
 
     def insertFromMimeData(self, func):
+        """ 粘贴数据 """
+
         def inner(source: QMimeData):
             if source.hasImage():
                 image = source.imageData()
@@ -308,6 +311,17 @@ class CusNoteEdit(CusQWidget, Ui_CusNoteEdit):
                                 self.textEdit.textCursor().insertText(f.read())
                         except Exception as e:
                             VDialog.doSomething(VDialogType.Error, f'发生错误:{e}')
+            elif source.hasFormat('application/x-qt-windows-mime;value="Titled Hyperlink Format"') and (
+                    "http:" in source.text() or "https:" in source.text()):
+                """ 如果是包含标题的超链接，尝试重新拼接标题，加入链接地址"""
+                ss = re.sub(
+                    r'<!--StartFragment--><a href="([^"]*)"([^>]*)>(.*)</a><!--EndFragment-->',
+                    r'<!--StartFragment--><a href="\1"\2>[\3](\1)</a><!--EndFragment-->',
+                    source.html())
+                scc = QMimeData()
+                scc.setHtml(ss)
+                scc.setText(source.text())
+                func(scc)
             else:
                 func(source)
 
@@ -361,6 +375,16 @@ class CusNoteEdit(CusQWidget, Ui_CusNoteEdit):
 
         return inner
 
+    def keyPressEvent(self, event: QKeyEvent) -> None:
+        if event.key() == Qt.Key_Control:
+            self.ctrlPress = True
+        super(CusNoteEdit, self).keyPressEvent(event)
+
+    def keyReleaseEvent(self, event: QKeyEvent) -> None:
+        if event.key() == Qt.Key_Control:
+            self.ctrlPress = False
+        super(CusNoteEdit, self).keyReleaseEvent(event)
+
     def textEditMouseRelease(self, func):
         def inner(e: QMouseEvent):
             if e.button() == Qt.RightButton:
@@ -383,20 +407,24 @@ class CusNoteEdit(CusQWidget, Ui_CusNoteEdit):
                 func(e)
                 return
             url = self.textEdit.anchorAt(e.pos())
-            if url and url in self.images:
-                if use_cus_view == '0':
-                    tmpFilePath = os.path.abspath(temp_path_images + f'/temp{url}.{self.images[url][1]}')
-                    with open(tmpFilePath, 'wb') as imgFile:
-                        imgFile.write(self.images[url][0].data())
+            if url:
+                if url in self.images:
+                    if use_cus_view == '0':
+                        tmpFilePath = os.path.abspath(temp_path_images + f'/temp{url}.{self.images[url][1]}')
+                        with open(tmpFilePath, 'wb') as imgFile:
+                            imgFile.write(self.images[url][0].data())
 
-                    QDesktopServices.openUrl(QUrl("file:///" + tmpFilePath, QUrl.TolerantMode))
-                else:
-                    img = QImage()
-                    img.loadFromData(self.images[url][0], self.images[url][1])
-                    iv = CusImageView(title=f'图片{url}')
-                    iv.setLabelImage(img, self.images[url][1])
-                    iv.show()
-
+                        QDesktopServices.openUrl(QUrl("file:///" + tmpFilePath, QUrl.TolerantMode))
+                    else:
+                        img = QImage()
+                        img.loadFromData(self.images[url][0], self.images[url][1])
+                        iv = CusImageView(title=f'图片{url}')
+                        iv.setLabelImage(img, self.images[url][1])
+                        iv.show()
+                elif self.ctrlPress and (url.startswith('http://') or url.startswith('https://')):
+                    # 按下ctrl键才能打开链接
+                    self.ctrlPress = False
+                    QDesktopServices.openUrl(QUrl(url))
             func(e)
 
         return inner
