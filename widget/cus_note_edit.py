@@ -16,6 +16,7 @@ from modules.vdialog import VDialogType, VDialog
 from widget.cus_image_view import CusImageView
 from widget.cus_input_box import CusInputBox
 from widget.cus_tag_label import CusTagLabel
+from widget.cus_tags_choose import CusTagsChoose
 from widget.ui.ui_CusNoteEdit import Ui_CusNoteEdit
 
 
@@ -112,9 +113,9 @@ class CusNoteEdit(CusQWidget, Ui_CusNoteEdit):
             self.listWidgeTags.setItemWidget(newItem, cusTag)
 
     def addTag(self, tag: list):
-
         self.tags.extend([t['tid'] for t in tag])
         self.loadTags()
+        self.modifyStatus('tags', self.tags != self.rtags)
 
     def delTag(self, item: CusTagLabel):
         if item.tid in self.tags:
@@ -122,7 +123,7 @@ class CusNoteEdit(CusQWidget, Ui_CusNoteEdit):
         self.listWidgeTags.takeItem(item.tsort)
         item.close()
         item.deleteLater()
-        del item
+        self.tagIndexesMoved()
         self.modifyStatus('tags', self.tags != self.rtags)
 
     def overwriteTagDropEvent(self, func):
@@ -195,7 +196,11 @@ class CusNoteEdit(CusQWidget, Ui_CusNoteEdit):
 
     @Slot()
     def on_btnAddTag_clicked(self):
+        # self.add_new_tag()
+        a = CusTagsChoose(self)
+        a.show()
 
+    def add_new_tag(self):
         text = CusInputBox.getText('创建标签', '标签名', self)
 
         if not text or not text[1] or not text[0]:
@@ -206,8 +211,7 @@ class CusNoteEdit(CusQWidget, Ui_CusNoteEdit):
             return
         # 创建标签并入库
         tid = DBManager.addTag(tagText)
-        self.addTag([{'tid': tid, 'text': tagText, 'sort': len(self.tags)}])
-        self.modifyStatus('tags', self.tags != self.rtags)
+        self.addTag([{'tid': tid, 'text': tagText}])
 
     @Slot()
     def on_textEdit_textChanged(self):

@@ -181,16 +181,7 @@ class DBManager:
         while q.next():
             res.update({n: q.value(n) for n in cols})
         # 查标签
-        q.prepare(
-            'SELECT TAGS.*,RTREL.sort sort FROM TAGS JOIN RTREL ON TAGS.tid=RTREL.tid AND RTREL.rid= :rid ORDER BY sort')
-        q.bindValue(':rid', rid)
-        q.exec()
-        qs = q.record()
-        cols = [qs.fieldName(i) for i in range(qs.count())]
-        res['tags'] = []
-        while q.next():
-            res['tags'].append({n: q.value(n) for n in cols})
-
+        res['tags'] = DBManager.queryTagsByRid(rid)
         return res
 
     @staticmethod
@@ -291,7 +282,21 @@ class DBManager:
         return res
 
     @staticmethod
-    def addTag(text: str) -> int | None:
+    def queryTagsByRid(rid=0) -> list:
+        q = DBManager.query
+        q.prepare(
+            'SELECT TAGS.*,RTREL.sort sort FROM TAGS JOIN RTREL ON TAGS.tid=RTREL.tid AND RTREL.rid= :rid ORDER BY sort')
+        q.bindValue(':rid', rid)
+        q.exec()
+        qs = q.record()
+        cols = [qs.fieldName(i) for i in range(qs.count())]
+        res = []
+        while q.next():
+            res.append({n: q.value(n) for n in cols})
+        return res
+
+    @staticmethod
+    def addTag(text: str, type=0) -> int | None:
         """ 添加标签并返回主键tid """
         if not text:
             VDialog.doSomething(VDialogType.Error, '内容不能为空')
@@ -307,9 +312,10 @@ class DBManager:
         if tid is not None:
             return tid
         # 插入数据
-        csql = 'INSERT INTO TAGS (text) VALUES ( :text )'
+        csql = 'INSERT INTO TAGS (text,type) VALUES ( :text ,:type)'
         q.prepare(csql)
         q.bindValue(':text', text)
+        q.bindValue(':type', type)
         f = q.exec()
         if not f:
             VDialog.doSomething(VDialogType.Error, '添加标签失败' + q.lastError().text())
@@ -444,3 +450,28 @@ class DBManager:
         q.prepare('DELETE FROM ATTACHFILE WHERE rid= :rid')
         q.bindValue(':rid', rid)
         q.exec()
+
+    @staticmethod
+    def queryUseTags() -> list:
+        """ 查询常用标签列表，根据关系表倒排 """
+        q = DBManager.query
+        q.prepare(
+            "SELECT TAGS.tid,TAGS.text FROM TAGS LEFT JOIN (SELECT MAX(uid) uid,tid FROM RTREL GROUP BY RTREL.tid )r ON r.tid=TAGS.tid WHERE TAGS.type=0  ORDER BY r.uid DESC,TAGS.tid Desc")
+        q.exec()
+        res = []
+        while q.next():
+            res.append([q.value(0), q.value(1)])
+        return res
+
+    @staticmethod
+    def queryTypeTags(type=0) -> list:
+        """ 按类型查询标签 """
+        q = DBManager.query
+        q.prepare(
+            "SELECT tid,text FROM TAGS WHERE type=:type")
+        q.bindValue(':type', type)
+        q.exec()
+        res = []
+        while q.next():
+            res.append([q.value(0), q.value(1)])
+        return res

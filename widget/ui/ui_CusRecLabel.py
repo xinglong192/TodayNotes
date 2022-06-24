@@ -8,10 +8,15 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication, QMetaObject, QSize)
-from PySide6.QtGui import (QFont)
-from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel,
-                               QPushButton, QSizePolicy, QVBoxLayout)
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QApplication, QFrame, QHBoxLayout, QLabel,
+    QPushButton, QSizePolicy, QVBoxLayout, QWidget)
 
 class Ui_frameRecLabel(object):
     def setupUi(self, frameRecLabel):
@@ -45,6 +50,18 @@ class Ui_frameRecLabel(object):
 "#framew:hover{\n"
 " border:2px outset rgb(198, 229, 220);\n"
 " border-left-color:rgb(73, 120, 100);\n"
+"}\n"
+"#framew[tagStauts=\"todo\"]{\n"
+"background-color: rgba(251, 251, 219,180);\n"
+"}\n"
+"#framew[tagStauts=\"todos\"]{\n"
+"background-color: rgba(255, 227, 183,180);\n"
+"}\n"
+"#framew[tagStauts=\"cancel\"]{\n"
+"background-color: rgba(207, 207, 207,200);\n"
+"}\n"
+"#framew[tagStauts=\"done\"]{\n"
+"background-color: rgba(94, 193, 143,150);\n"
 "}")
         self.framew.setFrameShape(QFrame.StyledPanel)
         self.framew.setFrameShadow(QFrame.Raised)
