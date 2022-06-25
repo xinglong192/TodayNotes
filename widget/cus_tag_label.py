@@ -55,4 +55,4 @@ class CusTagLabel(QWidget, Ui_CusTagLabel):
     def delTag(self):
         res = VDialog.doSomething(VDialogType.Question, None, '确认', '确定删除此标签？')
         if res:
-            CusMsgBus.send('delTag', self)
+            CusMsgBus.send('delTag', self.tid)

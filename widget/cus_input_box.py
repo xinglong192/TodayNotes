@@ -13,6 +13,7 @@ class CusInputBox(QDialog, Ui_CusInputBox):
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.ismoving = False
         self.setupUi(self)
+        self.labeText.hide()
         if not tf:
             self.setWindowFlags(Qt.CustomizeWindowHint)
         self.res = ()
@@ -28,12 +29,17 @@ class CusInputBox(QDialog, Ui_CusInputBox):
         self.reject()
 
     @staticmethod
-    def getText(title=None, pht='请输入', parent=None):
+    def getText(title=None, pht='请输入', parent=None, defVal=None, tipText=None):
         CusInputBox.__cur_box = CusInputBox(title, parent)
         if title:
             CusInputBox.__cur_box.setWindowTitle(title)
         if pht:
             CusInputBox.__cur_box.lineInput.setPlaceholderText(pht)
+        if defVal:
+            CusInputBox.__cur_box.lineInput.setText(defVal)
+        if tipText:
+            CusInputBox.__cur_box.labeText.setText(tipText)
+            CusInputBox.__cur_box.labeText.show()
         CusInputBox.__cur_box.exec()
         r = CusInputBox.__cur_box.res
         CusInputBox.__cur_box = None

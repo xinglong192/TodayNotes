@@ -29,7 +29,6 @@ class CusRecordLabel(QWidget, Ui_frameRecLabel):
         self.rid = rid
         self.setupUi(self)
         self.setWindowFlags(Qt.FramelessWindowHint)
-        self.__queryTagStatus()
 
     @property
     def rcon(self):
@@ -55,22 +54,6 @@ class CusRecordLabel(QWidget, Ui_frameRecLabel):
         self.__rtime = t
         self.__showtime = formatTime(t, self.__showDate)
         self.labelTime.setText(self.__showtime)
-
-    def __queryTagStatus(self):
-        """ 根据标签状态 选择样式 """
-        res = DBManager.queryTagsByRid(self.rid)
-        d = {r['text'] for r in res}
-        if '待办' in d:
-            self.framew.setProperty('tagStauts', 'todo')
-        if '待办S' in d:
-            self.framew.setProperty('tagStauts', 'todos')
-        if '取消' in d:
-            self.framew.setProperty('tagStauts', 'cancel')
-        if '完成' in d:
-            self.framew.setProperty('tagStauts', 'done')
-        self.framew.style().unpolish(self.framew)
-        self.framew.style().polish(self.framew)
-
 
     def mousePressEvent(self, e: QMouseEvent) -> None:
         if e.button() == Qt.LeftButton:

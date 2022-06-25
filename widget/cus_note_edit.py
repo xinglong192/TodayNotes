@@ -117,14 +117,17 @@ class CusNoteEdit(CusQWidget, Ui_CusNoteEdit):
         self.loadTags()
         self.modifyStatus('tags', self.tags != self.rtags)
 
-    def delTag(self, item: CusTagLabel):
-        if item.tid in self.tags:
-            self.tags.remove(item.tid)
-        self.listWidgeTags.takeItem(item.tsort)
-        item.close()
-        item.deleteLater()
+    def delTag(self, tid,mdf=True):
+        if tid not in self.tags:
+            return
+
+        ti=self.tags.index(tid)
+        self.tags.remove(tid)
+        self.listWidgeTags.takeItem(ti)
+        if not mdf:
+            self.rtags=self.tags.copy()
         self.tagIndexesMoved()
-        self.modifyStatus('tags', self.tags != self.rtags)
+
 
     def overwriteTagDropEvent(self, func):
         def inner(e: QDropEvent):

@@ -326,11 +326,25 @@ class DBManager:
         return tid
 
     @staticmethod
-    def delTag(text: str) -> int | None:
+    def delTag(tid: int | str):
         """ 删除标签 """
-        # FIXME 删除标签sql 因为表结构设计问题，暂时还没有删除的页面操作
-        pass
+        q = DBManager.query
+        q.prepare('DELETE FROM RTREL WHERE tid= :tid')
+        q.bindValue(':tid', tid)
+        q.exec()
+        q.prepare('DELETE FROM TAGS WHERE tid= :tid')
+        q.bindValue(':tid', tid)
+        q.exec()
 
+
+    @staticmethod
+    def renameTag(tid: int | str,text:str):
+        """ 重命名标签 """
+        q = DBManager.query
+        q.prepare('UPDATE TAGS SET text = :text WHERE tid=:tid')
+        q.bindValue(':text', text)
+        q.bindValue(':tid', tid)
+        q.exec()
     @staticmethod
     def queryForNotesList(condition: dict):
         res = []

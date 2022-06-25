@@ -8,15 +8,22 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication, QMetaObject, QSize)
-from PySide6.QtWidgets import (QGridLayout, QHBoxLayout, QLineEdit,
-                               QPushButton, QSizePolicy, QSpacerItem)
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout, QLabel,
+    QLineEdit, QPushButton, QSizePolicy, QSpacerItem,
+    QWidget)
 
 class Ui_CusInputBox(object):
     def setupUi(self, CusInputBox):
         if not CusInputBox.objectName():
             CusInputBox.setObjectName(u"CusInputBox")
-        CusInputBox.resize(177, 68)
+        CusInputBox.resize(177, 75)
         self.gridLayout_2 = QGridLayout(CusInputBox)
         self.gridLayout_2.setSpacing(0)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
@@ -76,9 +83,25 @@ class Ui_CusInputBox(object):
 
         self.horizontalLayout_3 = QHBoxLayout()
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.verticalSpacer = QSpacerItem(20, 8, QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self.horizontalSpacer_4 = QSpacerItem(5, 8, QSizePolicy.Fixed, QSizePolicy.Minimum)
 
-        self.horizontalLayout_3.addItem(self.verticalSpacer)
+        self.horizontalLayout_3.addItem(self.horizontalSpacer_4)
+
+        self.labeText = QLabel(CusInputBox)
+        self.labeText.setObjectName(u"labeText")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.labeText.sizePolicy().hasHeightForWidth())
+        self.labeText.setSizePolicy(sizePolicy2)
+        self.labeText.setMinimumSize(QSize(0, 15))
+        self.labeText.setMaximumSize(QSize(16777215, 15))
+
+        self.horizontalLayout_3.addWidget(self.labeText)
+
+        self.horizontalSpacer_3 = QSpacerItem(5, 8, QSizePolicy.MinimumExpanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_3.addItem(self.horizontalSpacer_3)
 
 
         self.gridLayout.addLayout(self.horizontalLayout_3, 0, 0, 1, 3)
@@ -97,5 +120,6 @@ class Ui_CusInputBox(object):
         self.lineInput.setPlaceholderText(QCoreApplication.translate("CusInputBox", u"\u8bf7\u8f93\u5165", None))
         self.btnConfirm.setText(QCoreApplication.translate("CusInputBox", u"\u786e\u5b9a", None))
         self.btnCancel.setText(QCoreApplication.translate("CusInputBox", u"\u53d6\u6d88", None))
+        self.labeText.setText(QCoreApplication.translate("CusInputBox", u"\u8bf7\u8f93\u5165", None))
     # retranslateUi
 

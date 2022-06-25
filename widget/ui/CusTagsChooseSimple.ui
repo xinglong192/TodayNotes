@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CusTagList</class>
+ <widget class="QWidget" name="CusTagList">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>107</width>
+    <height>156</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>标签选择</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <item row="0" column="0">
+    <widget class="QFrame" name="bFrame">
+     <property name="styleSheet">
+      <string notr="true">#bFrame{
+background-color: rgba(221, 221, 221, 180);
+border:2px inset rgba(175, 175, 175, 180);
+}</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QPushButton" name="btnAddNew">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>+ 新增标签</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>常用标签</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QListWidget" name="lvCus">
+        <property name="styleSheet">
+         <string notr="true">#lvCus::item{
+	border:1px solid rgba(40, 81, 121,0.5);
+	margin:1px;
+}
+#lvCus::item:hover{
+	border:1px solid rgba(40, 81, 160,0.3);
+	background-color: rgba(179, 213, 255, 100);
+	margin:1px;
+}
+#lvCus::item:selected:active{
+	border:1px inset rgba(126, 199, 255, 100);
+	
+	color: rgba(0, 0, 0, 150);
+	background-color: rgba(125, 170, 165, 100);
+	margin:1px;
+}
+#lvCus QScrollBar{
+	width:2px;
+    border: none;
+    background-color: rgba(85, 170, 127,0.6);
+}</string>
+        </property>
+        <property name="editTriggers">
+         <set>QAbstractItemView::NoEditTriggers</set>
+        </property>
+        <property name="defaultDropAction">
+         <enum>Qt::IgnoreAction</enum>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

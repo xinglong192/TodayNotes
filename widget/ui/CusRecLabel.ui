@@ -69,18 +69,6 @@ border-left-color: rgba(40, 81, 121,0.5);
 #framew:hover{
  border:2px outset rgb(198, 229, 220);
  border-left-color:rgb(73, 120, 100);
-}
-#framew[tagStauts=&quot;todo&quot;]{
-background-color: rgba(251, 251, 219,180);
-}
-#framew[tagStauts=&quot;todos&quot;]{
-background-color: rgba(255, 227, 183,180);
-}
-#framew[tagStauts=&quot;cancel&quot;]{
-background-color: rgba(207, 207, 207,200);
-}
-#framew[tagStauts=&quot;done&quot;]{
-background-color: rgba(94, 193, 143,150);
 }</string>
      </property>
      <property name="frameShape">
