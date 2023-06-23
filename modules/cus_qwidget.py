@@ -1,12 +1,12 @@
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QMouseEvent, QGuiApplication
-from PySide6.QtWidgets import QWidget
+from PySide6.QtGui import QMouseEvent, QGuiApplication, QContextMenuEvent, QAction, QCursor
+from PySide6.QtWidgets import QWidget, QMenu, QStyle
 
 
 class CusQWidget(QWidget):
     """ 实现窗口拖动"""
 
-    def __init__(self,parent=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowFlags(Qt.CustomizeWindowHint)
         self.setAttribute(Qt.WA_DeleteOnClose)
@@ -32,3 +32,26 @@ class CusQWidget(QWidget):
 
         self.ismoving = False
         e.accept()
+
+    def contextMenuEvent(self, event: QContextMenuEvent) -> None:
+        """ 用于顶部栏 右键菜单"""
+        print('-==-=-=-=--=-=menu')
+        menu = QMenu(self)
+        menu.setObjectName("topRightMenu")
+        windowAction = QAction(
+            self.style().standardIcon(QStyle.SP_TitleBarShadeButton), "置顶窗口")
+        if self.windowFlags() & Qt.WindowStaysOnTopHint:
+            windowAction.setIcon(self.style().standardIcon(QStyle.SP_TitleBarCloseButton))
+            windowAction.setText('取消置顶')
+        windowAction.setObjectName('windowAction')
+        windowAction.setParent(menu)
+        windowAction.triggered.connect(self.changeWindowTopStatus)
+        menu.addAction(windowAction)
+        menu.exec(QCursor.pos())
+
+    def changeWindowTopStatus(self):
+        if self.windowFlags() & Qt.WindowStaysOnTopHint:
+            self.setWindowFlag(Qt.WindowStaysOnTopHint, False)
+        else:
+            self.setWindowFlag(Qt.WindowStaysOnTopHint)
+        self.show()

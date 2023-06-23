@@ -18,7 +18,7 @@ copytree(sourceDir, targetDir)
 # 执行脚本
 PyInstaller.__main__.run([
     '-F',
-    '-n=todaynotes_v2_3_1',
+    '-n=todaynotes_v2_3_5',
     '--windowed',
     '-i=./resource/images/note.ico',
     basedir + '/mainView.py'
